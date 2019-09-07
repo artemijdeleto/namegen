@@ -3,8 +3,8 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Name generator</title>
-	<meta name=viewport content="width=device-width,initial-scale=1">
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 	<style>
 		* {
 			box-sizing: border-box;
@@ -45,14 +45,25 @@
 	<main>
 		<h1>Random name generator</h1>
 		<hr>
-		<div class="row">
+		<p>Recommended: 100x, 10-20 words, 3-10 characters, exclude q,w,z,y</p>
+		<div class="form-row">
+			<div class="form-group col-md-2">
+				<label for="factor">Factor</label>
+				<input id="factor" type="number" class="form-control" placeholder="1-1000" value="100">
+			</div>
+			<!-- <div class="form-group col-md-2">
+				<label for="consonants">Consonants</label>
+				<input id="consonants" type="number" class="form-control" placeholder="1-3" value="1">
+			</div> -->
+		</div>
+		<div class="form-row">
 			<div class="form-group col-md-2">
 				<label for="amount">Amount</label>
-				<input id="amount" type="number" class="form-control" placeholder="e.g: 5, 50, 100" value="100">
+				<input id="amount" type="number" class="form-control" placeholder="e.g: 5, 50" value="10">
 			</div>
 			<div class="form-group col-md-2">
 				<label for="length">Length</label>
-				<input id="length" type="number" class="form-control" placeholder="e.g: 4, 10" value="8">
+				<input id="length" type="number" class="form-control" placeholder="e.g: 4, 10" value="6">
 			</div>
 			<div class="form-group col-md-4">
 				<label for="firstLetter">First letter</label>
@@ -69,161 +80,6 @@
 			<p class="lead">Play with settings and generate amazing words!</p>
 		</div>
 	</main>
-	<script>
-		const container = document.getElementById('names');
-		const alphabet = [
-			'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
-			'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',
-			'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
-		];
-		const canRepeat = [
-			'o', 'e', 'f', 'a'
-		];
-		const consonants = [
-			'b', 'c', 'd', 'f', 'g', 'h',
-			'j', 'k', 'l', 'm', 'n', 'p',
-			'q', 'r', 's', 't', 'v', 'w', 'x', 'z'
-		];
-		const priority = [
-			'ar', 'ae', 'af',
-			'br', 'bo', 'be', 'bu',
-			'ca', 'cl', 'ce', 'cu', 'cr',
-			'de', 'do', /*'di',*/
-			'ft', 'fe', 'fo', 'fi', 'fl',
-			// 'go', 'ge', 'ga',
-			'sc', 'st', 'si', 'so', 'sa', 'sh', 'sch',
-			're', 'ro', 'ra', 'ru',
-			'no', 'ne', 'ny',
-			'os', 'on',
-			// 'ur'
-		];
-		const ignore = [
-			'tg', 'vf', 'ls', 'vb', 'sz',
-			'fb', 'tm', 'hk', 'ht', 'kt',
-			'kb', 'tb', 'bk', 'pn', 'rg',
-			'cg', 'bt', 'lb', 'gv', 'bp',
-			'bf', 'pk', 'df', 'gm', 'hm',
-			'fh', 'pv', 'cd', 'dp', 'dt',
-			'vp', 'fv', 'jf', 'jn', 'jp',
-			'db',
-			'snm', 'rnr', 'rcf', 'sfs',
-			'vcp', 'mtn', 'fnm', 'crp',
-			'scs', 'svm', 'src', 'sbr',
-			'snr', 'snp', 'pfr', 'mrt',
-			'rtn', 'mfc', 'sns',
-			'mnm', 'svs'
-		];
-		const regex = new RegExp('' + priority.join('|') + '', 'gi');
-// q,w,y,j,x,z,l
-// e,r,t,o,p,a,s,d,f,g,h,k,l,b,v,c,n,m
-		function generate() {
-			// let localAlphabet = [];
-			const exclude = document.getElementById('exclude').value.split(',');
-
-			const localAlphabet = alphabet.reduce(function (prev, el) {
-				const value = el.split(' ').join('').toLowerCase();
-				if (!exclude.includes(value)) {
-					prev.push(value);
-				}
-				return prev;
-			}, []); // it doesnt work
-
-			// console.log(localAlphabet);
-
-			const temp = document.getElementById('firstLetter').value.split(',');
-			const firstLetter = temp.reduce(function (prev, el) {
-				const value = el.split(' ').join('').toLowerCase();
-				if (localAlphabet.includes(value)) {
-					prev.push(value);
-				}
-				return prev;
-			}, []);
-
-			let strings = [];
-
-			container.innerHTML = '';
-			const amount = document.getElementById('amount').value * 1000;
-			const length = document.getElementById('length').value || 8;
-			for (let i = 0; i < amount; i++) {
-				// firstLetter.forEach(function(el) {
-					let string = '';
-					// const element = document.createElement('div');
-
-					for (let j = 0; j < length; j++) {
-						let char = '';
-						// debugger;
-						do {
-							char = localAlphabet[random(0, localAlphabet.length)];
-						} while (
-								( j == 0 && (firstLetter.length > 0 && !firstLetter.includes(char)) )
-								||
-								( string.charAt(string.length - 1) == char && !canRepeat.includes(char) )
-								||
-								( ignore.includes('' + string.slice(string.length - 1) + char) )
-								||
-								( ignore.includes('' + string.slice(string.length - 2) + char) )
-								||
-								(
-									consonants.includes(char)
-									&&
-									consonants.includes(string.charAt(string.length - 1)) // one consonant: book, fire
-									&&
-									consonants.includes(string.charAt(string.length - 2))/* // two: fly, vent
-									&&
-									consonants.includes(string.charAt(string.length - 3))
-									&&
-									consonants.includes(string.charAt(string.length - 4))*/
-								)
-							)
-						string += char;
-					}
-
-					strings.push(string);
-
-					/*element.classList.add('card');
-					element.innerText = string.charAt(0).toUpperCase() + string.slice(1);
-
-					container.appendChild(element);*/
-				// });
-			}
-
-			
-			strings.sort(function (a, b) {
-				matches = {
-					a: [],
-					b: []
-				}
-				matches.a = a.match(regex) || [];
-				matches.b = b.match(regex) || [];
-
-				if (matches.a.length > matches.b.length) {
-					// console.log(`${a} (Matches: ${matches.a.join(', ')}) better than ${b} (Matches: ${matches.b.join(', ')})`);
-					return -1;
-				}
-
-				else return 1;
-
-				if (matches.a.length < matches.b.length) {
-					return 1;
-				}
-
-				return 0;
-			});
-
-			strings.length = amount / 1000;
-
-			strings.forEach(function (el) {
-				const element = document.createElement('div');
-				element.classList.add('card');
-				element.innerText = el.charAt(0).toUpperCase() + el.slice(1);
-				container.appendChild(element);
-			});
-		}
-
-		function random(min, max) {
-			let rand = min + Math.random() * (max - min);
-			return Math.floor(rand);
-		}
-	</script>
+	<script src="script.js"></script>
 </body>
 </html>

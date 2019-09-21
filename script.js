@@ -60,6 +60,7 @@ const regex = new RegExp('' + priority.join('|') + '', 'gi');
 // e,r,t,o,p,a,s,d,f,g,h,k,l,b,v,c,n,m
 
 function generate() {
+	container.innerHTML = '<p class="lead">Generating names. This may take a while..</p>';
 	// let localAlphabet = [];
 	const COEFFICIENT = document.getElementById('factor').value || 1000;
 	const exclude = document.getElementById('exclude').value.split(',');
@@ -84,8 +85,6 @@ function generate() {
 	}, []);
 
 	let strings = [];
-
-	container.innerHTML = '';
 	const amount = document.getElementById('amount').value * COEFFICIENT;
 	const length = document.getElementById('length').value || 8;
 	for (let i = 0; i < amount; i++) {
@@ -95,7 +94,7 @@ function generate() {
 
 			do {
 				if (strings.includes(string)) {
-					console.log('string is already used, retry..');
+					console.info(`Name ${string} is already used, retry..`);
 				}
 				string = '';
 				for (let j = 0; j < length; j++) {
@@ -117,11 +116,30 @@ function generate() {
 							( ignore.includes('' + string.slice(string.length - 2) + char) )
 							||
 							(
-								consonants.includes(char)
+								(
+									consonants.includes(char)
+									&&
+									consonants.includes(string.charAt(string.length - 1)) // one consonant: book, fire
+								)
 								&&
-								consonants.includes(string.charAt(string.length - 1))/* // one consonant: book, fire
+								(
+									consonants.includes(char)
+									&&
+									consonants.includes(string.charAt(string.length - 1))
+									&&
+									consonants.includes(string.charAt(string.length - 2))  // two: fly, vent
+								)
 								&&
-								consonants.includes(string.charAt(string.length - 2)) // two: fly, vent
+								(
+									consonants.includes(char)
+									&&
+									consonants.includes(string.charAt(string.length - 1))
+									&&
+									consonants.includes(string.charAt(string.length - 2))
+									&&
+									consonants.includes(string.charAt(string.length - 3))  // two: fly, vent
+								)
+								/*
 								&&
 								consonants.includes(string.charAt(string.length - 3))
 								&&
@@ -151,10 +169,8 @@ function generate() {
 		matches.b = b.match(regex) || [];
 
 		if (matches.a.length > matches.b.length) {
-			// console.log(`${a} (Matches: ${matches.a.join(', ')}) better than ${b} (Matches: ${matches.b.join(', ')})`);
 			return -1;
 		}
-
 		else return 1;
 
 		if (matches.a.length < matches.b.length) {
@@ -164,14 +180,61 @@ function generate() {
 		return 0;
 	});
 
-	strings.length = amount / COEFFICIENT;
+	container.innerHTML = '';
 
-	strings.forEach(function (el) {
-		const element = document.createElement('div');
-		element.classList.add('card');
-		element.innerText = el.charAt(0).toUpperCase() + el.slice(1);
-		container.appendChild(element);
-	});
+	(async function() {
+		let available = 0;
+
+		for (const name of strings) {
+			if (available === (amount / COEFFICIENT)) break;
+
+			// const response = await fetch(`https://api.whois.vu/?q=${name}.ru`);
+			// const response = await fetch(`https://api.whois.vu/?q=${name}.com`);
+			const response = await Promise.all([
+				fetch(`https://api.whois.vu/?q=${name}.ru`),
+				fetch(`https://api.whois.vu/?q=${name}.com`)
+			]);
+			let [ru, com] = await Promise.all( response.map(json => json.json()) );
+			ru = (ru.available === 'yes') ? true : false;
+			com = (com.available === 'yes') ? true : false;
+			if (ru || com) {
+				available++;
+				render({
+					name,
+					ru,
+					com
+				});
+			}
+		}
+
+		console.info(`Successfully printed ${available} names`);
+	})();
+
+	// strings.length = ;
+}
+
+function render({ name, ru, com }) {
+	const element = document.createElement('div');
+	function badge(status) {
+		return `<span class="badge badge-pill ${status ? 'badge-success' : 'badge-danger'}">${status ? 'OK' : 'Used'}</span>`
+	}
+	element.classList.add('card', 'm-2', 'flex-grow-1', 'bg-light', 'text-dark');
+	element.innerHTML = `
+		<h3 class="card-header">
+			${name.charAt(0).toUpperCase() + name.slice(1)}
+		</h3>
+		<ul class="list-group list-group-flush">
+			<li class="list-group-item">
+				${name}.ru
+				${badge(ru)}
+			</li>
+			<li class="list-group-item">
+				${name}.com
+				${badge(com)}
+			</li>
+		</ul>
+	`;
+	container.appendChild(element);
 }
 
 function random(min, max) {

@@ -6,15 +6,8 @@
 	<meta name="viewport" content="width=device-width,initial-scale=1">
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 	<style>
-		* {
-			box-sizing: border-box;
-			font-family: Inter, Helvetica, Roboto, sans-serif;
-		}
-
 		body {
-			color: #ddd;
-			background: #333;
-			margin: 0;
+			font-family: Inter, Helvetica, Roboto, sans-serif;
 		}
 
 		main {
@@ -22,28 +15,12 @@
 			padding: 2rem;
 			margin: 0 auto;
 		}
-
-		#names {
-			display: flex;
-			justify-content: space-between;
-			flex-wrap: wrap;
-		}
-
-		.card {
-			padding: 2rem;
-			font-size: 2rem;
-			font-weight: 500;
-			border-radius: 5px;
-			background: #222;
-			flex-grow: 1;
-			text-align: center;
-			margin: 0 1rem 1rem 0;
-		}
 	</style>
 </head>
-<body>
+<body class="bg-dark text-white">
 	<main>
-		<h1>Random name generator</h1>
+		<h1>Generate name</h1>
+		<p class="text-muted">And check its availability</p>
 		<hr>
 		<p>Recommended: 100x, 10-20 words, 3-10 characters, exclude q,w,z,y</p>
 		<div class="form-row">
@@ -74,10 +51,13 @@
 				<input id="exclude" class="form-control" placeholder="e.g: q / w,z,y">
 			</div>
 		</div>
-		<button onclick="generate()" class="btn btn-success btn-block btn-lg">Generate</button>
+		<button onclick="generate()" class="btn btn-primary btn-block btn-lg">Generate</button>
 		<hr>
-		<div id="names">
-			<p class="lead">Play with settings and generate amazing words!</p>
+
+		<div class="container-fluid">
+			<div id="names" class="row justify-content-between">
+				<p class="lead">Play with settings and generate amazing words!</p>
+			</div>
 		</div>
 	</main>
 	<script src="script.js"></script>

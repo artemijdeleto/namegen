@@ -170,8 +170,7 @@ function generate() {
 
 		if (matches.a.length > matches.b.length) {
 			return -1;
-		}
-		else return 1;
+		} else return 1;
 
 		if (matches.a.length < matches.b.length) {
 			return 1;
@@ -185,39 +184,40 @@ function generate() {
 	(async function() {
 		let available = 0;
 
+		function status(domain) {
+			return (domain.available === 'yes') ? true : false
+		}
+
 		for (const name of strings) {
 			if (available === (amount / COEFFICIENT)) break;
 
-			// const response = await fetch(`https://api.whois.vu/?q=${name}.ru`);
-			// const response = await fetch(`https://api.whois.vu/?q=${name}.com`);
 			const response = await Promise.all([
 				fetch(`https://api.whois.vu/?q=${name}.ru`),
 				fetch(`https://api.whois.vu/?q=${name}.com`)
 			]);
 			let [ru, com] = await Promise.all( response.map(json => json.json()) );
-			ru = (ru.available === 'yes') ? true : false;
-			com = (com.available === 'yes') ? true : false;
+			ru = status(ru);
+			com = status(com);
 			if (ru || com) {
 				available++;
-				render({
-					name,
-					ru,
-					com
-				});
+				render({ name, ru, com });
 			}
 		}
 
 		console.info(`Successfully printed ${available} names`);
 	})();
-
-	// strings.length = ;
 }
 
 function render({ name, ru, com }) {
-	const element = document.createElement('div');
 	function badge(status) {
-		return `<span class="badge badge-pill ${status ? 'badge-success' : 'badge-danger'}">${status ? 'OK' : 'Used'}</span>`
+		return `
+			<span class="badge badge-pill ${status ? 'badge-success' : 'badge-danger'}">
+				${status ? 'OK' : 'Used'}
+			</span>
+		`;
 	}
+
+	const element = document.createElement('div');
 	element.classList.add('card', 'm-2', 'flex-grow-1', 'bg-light', 'text-dark');
 	element.innerHTML = `
 		<h3 class="card-header">

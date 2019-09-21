@@ -22,16 +22,17 @@
 		<h1>Generate name</h1>
 		<p class="text-muted">And check its availability</p>
 		<hr>
-		<p>Recommended: 100x, 10-20 words, 3-10 characters, exclude q,w,z,y</p>
+		<p>Recommended: 10-20 words, 5-10 characters</p>
 		<div class="form-row">
 			<div class="form-group col-md-2">
-				<label for="factor">Factor</label>
-				<input id="factor" type="number" class="form-control" placeholder="1-1000" value="100">
+				<label for="quality">Quality</label>
+				<select id="quality" class="custom-select">
+					<option value="10">Low</option>
+					<option value="100" selected>Standard</option>
+					<option value="1000">Good</option>
+					<option value="10000">Ultimate</option>
+				</select>
 			</div>
-			<!-- <div class="form-group col-md-2">
-				<label for="consonants">Consonants</label>
-				<input id="consonants" type="number" class="form-control" placeholder="1-3" value="1">
-			</div> -->
 		</div>
 		<div class="form-row">
 			<div class="form-group col-md-2">

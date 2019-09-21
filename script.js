@@ -12,7 +12,6 @@ let amount;
 
 function generate() {
 	container.innerHTML = '<p class="lead">Generating names. This may take a while..</p>';
-	const COEFFICIENT = document.getElementById('factor').value || 1000;
 	const exclude = document.getElementById('exclude').value.split(',');
 	const temp = document.getElementById('firstLetter').value.split(',');
 
@@ -21,7 +20,7 @@ function generate() {
 		id: 'TASK_GENERATE',
 		options: {
 			amount,
-			factor: COEFFICIENT,
+			factor: document.getElementById('quality').value || 1000,
 			length: document.getElementById('length').value || 8,
 			exclude,
 			temp
@@ -76,11 +75,15 @@ function render({ name, ru, com }) {
 		</h3>
 		<ul class="list-group list-group-flush">
 			<li class="list-group-item">
-				${name}.ru
+				<a target="_blank" href="http://${name}.ru">
+					${name}.ru
+				</a>
 				${badge(ru)}
 			</li>
 			<li class="list-group-item">
-				${name}.com
+				<a target="_blank" href="http://${name}.com">
+					${name}.com
+				</a>
 				${badge(com)}
 			</li>
 		</ul>

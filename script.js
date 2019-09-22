@@ -4,6 +4,9 @@ worker.onmessage = function(e) {
 		show(e.data.data);
 	}
 };
+worker.onerror = function(e) {
+	console.error('Error in worker:', e);
+}
 const container = document.getElementById('names');
 
 document.querySelector('button').onclick = generate;
@@ -15,7 +18,8 @@ function generate() {
 	const exclude = document.getElementById('exclude').value.split(',');
 	const temp = document.getElementById('firstLetter').value.split(',');
 
-	amount = document.getElementById('amount').value || 10;
+	amount = +document.getElementById('amount').value || 10;
+
 	worker.postMessage({
 		id: 'TASK_GENERATE',
 		options: {
@@ -36,7 +40,7 @@ async function show(strings) {
 	}
 
 	for (const name of strings) {
-		if (available == amount) {
+		if (available === amount) {
 			console.info(`Reached ${available} available domains`);
 			break;
 		}

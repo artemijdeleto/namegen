@@ -1,18 +1,17 @@
-const alphabet = [
-	'a', 'b', 'c', 'd', 'e', 'f', 'g',
-	'h', 'i', 'j', 'k', 'l', 'm', 'n',
-	'o', 'p', 'q', 'r', 's', 't', 'u',
-	'v', 'w', 'x', 'y', 'z'
+const vowels = [
+	'a', 'e', 'i',
+	'o', 'u', 'y'
+];
+
+const consonants = [
+	'b', 'c', 'd', 'f', 'g',
+	'h', 'j', 'k', 'l', 'm',
+	'n', 'p', 'q', 'r', 's',
+	't', 'v', 'w', 'x', 'z'
 ];
 
 const canRepeat = [
 	'o', 'e', 'f', 's'
-];
-
-const consonants = [
-	'b', 'c', 'd', 'f', 'g', 'h',
-	'j', 'k', 'l', 'm', 'n', 'p',
-	'q', 'r', 's', 't', 'v', 'w', 'x', 'z'
 ];
 
 const priority = Array.from(new Set([
@@ -63,11 +62,6 @@ self.onmessage = function(e) {
 	}
 };
 
-priority.forEach(function (el) {
-	if (ignore.includes(el)) {
-		console.log(el);
-	}
-});
 const regex = new RegExp('' + priority.join('|') + '', 'gi');
 
 function random(min, max) {
@@ -76,9 +70,7 @@ function random(min, max) {
 }
 
 function generate(options) {
-	const strings = [];
-
-	const localAlphabet = alphabet.reduce(function (prev, el) {
+	const alphabet = vowels.concat(consonants).reduce(function (prev, el) {
 		const value = el.split(' ').join('').toLowerCase();
 		if (!options.exclude.includes(value)) {
 			prev.push(value);
@@ -88,7 +80,7 @@ function generate(options) {
 
 	const firstLetter = options.temp.reduce(function (prev, el) {
 		const value = el.split(' ').join('').toLowerCase();
-		if (localAlphabet.includes(value)) {
+		if (alphabet.includes(value)) {
 			prev.push(value);
 		}
 		return prev;
@@ -97,38 +89,41 @@ function generate(options) {
 	function factorial(length) {
 		let result = 1;
 		for (let i = 0; i < length; i++) {
-			result *= localAlphabet.length - i;
+			result *= alphabet.length - i;
 		}
 		return result;
 	}
 
-	const iterations = Math.min(
+	const words = Math.min(
 						factorial(options.length),
 						options.amount * options.factor
 					);
 	console.info(`Number of words with ${options.length} characters: ${factorial(options.length)}`);
-	console.info(`Number of iterations using factor: ${options.amount * options.factor}`);
-	console.info(`We'll use ${iterations} iterations`);
-	top:
-	for (let i = 0; i < iterations; i++) {
+	console.info(`Number of words using quality factor: ${options.amount * options.factor}`);
+	console.info(`We'll try to generate ${words} words`);
+
+	const strings = [];
+	let iterations = 0;
+	for (let i = 0; i < words; i++) {
+		if (iterations === words) {
+			console.warn('Retried for too many times, leaving loop..');
+			break;
+		}
+
 		let string = '';
-		let recursion = 0;
+		//console.log('Generating new word..');
 
 		do {
+			iterations++;
 			if (strings.includes(string)) {
-				if (recursion > 1) {
-					console.warn('Retried for too many times, leaving loop..');
-					break top;
-				}
-				recursion++;
-				console.info(`Name ${string} is already used, retry..`);
+				console.info(`Word is already used, retry..`);
 			}
 			string = '';
 			for (let j = 0; j < options.length; j++) {
 				let char = '';
 				// debugger;
 				do {
-					char = localAlphabet[random(0, localAlphabet.length)];
+					char = alphabet[random(0, alphabet.length)];
 				} while (
 						( j == 0 && (firstLetter.length > 0 && !firstLetter.includes(char)) )
 						||
@@ -161,10 +156,10 @@ function generate(options) {
 								consonants.includes(char)
 								&&
 								consonants.includes(string.charAt(string.length - 1))
-								&&
+								/*&&
 								consonants.includes(string.charAt(string.length - 2))
 								&&
-								consonants.includes(string.charAt(string.length - 3))  // two: fly, vent
+								consonants.includes(string.charAt(string.length - 3))*/  // two: fly, vent
 							)
 							/*
 							&&
@@ -179,6 +174,9 @@ function generate(options) {
 
 		strings.push(string);
 	}
+
+	console.info(`Generated ${strings.length} words. Real number of iterations: ${iterations}`);
+	console.info(`Sorting..`);
 
 	strings.sort(function (a, b) {
 		const matches = {

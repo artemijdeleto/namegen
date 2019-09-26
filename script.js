@@ -14,7 +14,12 @@ document.querySelector('button').onclick = generate;
 let amount;
 
 function generate() {
-	container.innerHTML = '<p class="lead">Generating names. This may take a while..</p>';
+	container.innerHTML = `
+		<p class="lead">
+			<span class="align-middle spinner-border spinner-border-sm"></span>
+			<span class="align-middle">Generating names. This may take a while..</span>
+		</p>
+	`;
 	const exclude = document.getElementById('exclude').value.split(',');
 	const temp = document.getElementById('firstLetter').value.split(',');
 
